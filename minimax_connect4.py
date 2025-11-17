@@ -183,7 +183,7 @@ def minimax(board, depth, is_maximizing, max_depth, alpha, beta):
                 beta = min (beta, best)
         return best
 
-def find_best_move(board, max_depth=8):
+def find_best_move(board, max_depth=6):
     best_val = -10**9
     best_col = None
     for col in range(COLS):
@@ -214,7 +214,7 @@ def play_cli():
             make_move(board, col, -1)
         else:
             print("AI is thinking...")
-            col = find_best_move(board, max_depth=5)
+            col = find_best_move(board, max_depth=6)
             if col is None:
                 print("No moves left.")
                 break
