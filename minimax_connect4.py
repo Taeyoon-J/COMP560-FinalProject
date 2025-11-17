@@ -48,45 +48,148 @@ def check_winner(board):
             if s == 4: return 1
             if s == -4: return -1
     return 0
+def non_terminal_eval(board):
+    # check number of unblocked groups of one, two, and three minus those of human
+    num_1 = 0
+    num_2 = 0
+    num_3 = 0
+    for r in range(ROWS):
+        for c in range(COLS-3):
+            num_AI = 0
+            num_human = 0
+            for i in range(4): 
+                if board[r][c+i] == 1:
+                    num_AI += 1
+                elif board[r][c+i] == -1:
+                    num_human += 1
+            if num_AI > 0 and num_human > 0:
+                num_AI = 0
+                num_human = 0
+            
+            match num_AI:
+                case 1: num_1 += 1
+                case 2: num_2 += 1
+                case 3: num_3 += 1
+           
+            match num_human:
+                case 1: num_1 -= 1
+                case 2: num_2 -= 1
+                case 3: num_3 -= 1        
+    
+    for c in range(COLS):
+        for r in range(ROWS-3):
+            num_AI = 0
+            num_human = 0
+            for i in range(4): 
+                if board[r+i][c] == 1:
+                    num_AI += 1
+                elif board[r+i][c] == -1:
+                    num_human += 1
+            if num_AI > 0 and num_human > 0:
+                num_AI = 0
+                num_human = 0
+            
+            match num_AI:
+                case 1: num_1 += 1
+                case 2: num_2 += 1
+                case 3: num_3 += 1
+           
+            match num_human:
+                case 1: num_1 -= 1
+                case 2: num_2 -= 1
+                case 3: num_3 -= 1 
+    
+    for r in range(ROWS-3):
+        for c in range(COLS-3):
+            num_AI = 0
+            num_human = 0
+            for i in range(4): 
+                if board[r+i][c+i] == 1:
+                    num_AI += 1
+                elif board[r+i][c+i] == -1:
+                    num_human += 1
+            if num_AI > 0 and num_human > 0:
+                num_AI = 0
+                num_human = 0
+            
+            match num_AI:
+                case 1: num_1 += 1
+                case 2: num_2 += 1
+                case 3: num_3 += 1
+           
+            match num_human:
+                case 1: num_1 -= 1
+                case 2: num_2 -= 1
+                case 3: num_3 -= 1 
 
+    for r in range(3, ROWS):
+        for c in range(COLS-3):
+            num_AI = 0
+            num_human = 0
+            for i in range(4): 
+                if board[r-i][c+i] == 1:
+                    num_AI += 1
+                elif board[r-i][c+i] == -1:
+                    num_human += 1
+            if num_AI > 0 and num_human > 0:
+                num_AI = 0
+                num_human = 0
+            
+            match num_AI:
+                case 1: num_1 += 1
+                case 2: num_2 += 1
+                case 3: num_3 += 1
+           
+            match num_human:
+                case 1: num_1 -= 1
+                case 2: num_2 -= 1
+                case 3: num_3 -= 1
+    
+    return num_1 * 0.01 + num_2 * 0.04 + num_3 * 0.1
+    
 def evaluate_board(board):
     winner = check_winner(board)
     if winner == 1: return 10
     if winner == -1: return -10
+    if winner == 0: return non_terminal_eval(board)
     return 0
 
-def minimax(board, depth, is_maximizing, max_depth):
+def minimax(board, depth, is_maximizing, max_depth, alpha, beta):
     score = evaluate_board(board)
-    if score == 10: return score - depth
-    if score == -10: return score + depth
-    if is_board_full(board) or depth == max_depth: return 0
+    if score == 10: return score 
+    if score == -10: return score 
+    if is_board_full(board) or depth == max_depth: return score
 
     if is_maximizing:
         best = -10**9
         for col in range(COLS):
             if is_valid_move(board, col):
                 row = make_move(board, col, 1)
-                val = minimax(board, depth+1, False, max_depth)
+                val = minimax(board, depth+1, False, max_depth, alpha, beta)
                 undo_move(board, row, col)
                 if val > best: best = val
+                if best >= beta: return best
+                alpha = max (alpha, best)
         return best
     else:
         best = 10**9
         for col in range(COLS):
             if is_valid_move(board, col):
                 row = make_move(board, col, -1)
-                val = minimax(board, depth+1, True, max_depth)
+                val = minimax(board, depth+1, True, max_depth, alpha, beta)
                 undo_move(board, row, col)
                 if val < best: best = val
+                if best <= alpha: return best
+                beta = min (beta, best)
         return best
 
-def find_best_move(board, max_depth=4):
+def find_best_move(board, max_depth=8):
     best_val = -10**9
     best_col = None
     for col in range(COLS):
         if is_valid_move(board, col):
             row = make_move(board, col, 1)
-            val = minimax(board, 0, False, max_depth)
+            val = minimax(board, 0, False, max_depth, -(10**9), 10**9)
             undo_move(board, row, col)
             if val > best_val:
                 best_val = val
@@ -111,7 +214,7 @@ def play_cli():
             make_move(board, col, -1)
         else:
             print("AI is thinking...")
-            col = find_best_move(board, max_depth=4)
+            col = find_best_move(board, max_depth=5)
             if col is None:
                 print("No moves left.")
                 break
