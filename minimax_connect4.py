@@ -1,6 +1,23 @@
 ROWS = 6
 COLS = 7
 
+# Build dynamic center-out move ordering once
+def build_column_order():
+    center = COLS // 2
+    order = [center]
+
+    for offset in range(1, COLS):
+        left = center - offset
+        right = center + offset
+        if left >= 0:
+            order.append(left)
+        if right < COLS:
+            order.append(right)
+
+    return order
+
+COLUMN_ORDER = build_column_order()
+
 def create_board():
     return [[0 for _ in range(COLS)] for _ in range(ROWS)]
 
@@ -173,7 +190,7 @@ def minimax(board, depth, is_maximizing, max_depth, alpha, beta):
 
     if is_maximizing:
         best = -10**9
-        for col in [3, 2, 4, 1, 5, 0, 6]:
+        for col in COLUMN_ORDER:
             if is_valid_move(board, col):
                 row = make_move(board, col, 1)
                 val = minimax(board, depth+1, False, max_depth, alpha, beta)
@@ -184,7 +201,7 @@ def minimax(board, depth, is_maximizing, max_depth, alpha, beta):
         return best
     else:
         best = 10**9
-        for col in [3, 2, 4, 1, 5, 0, 6]:
+        for col in COLUMN_ORDER:
             if is_valid_move(board, col):
                 row = make_move(board, col, -1)
                 val = minimax(board, depth+1, True, max_depth, alpha, beta)
