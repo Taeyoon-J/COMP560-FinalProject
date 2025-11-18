@@ -7,7 +7,7 @@ def create_board():
 def print_board(board):
     for r in board:
         print('|' + ''.join(' .' if c==0 else (' X' if c==1 else ' O') for c in r) + ' |')
-    print(' ' + ' '.join(str(i) for i in range(COLS)))
+    print('  ' + ' '.join(str(i) for i in range(COLS)))
 
 def is_valid_move(board, col):
     return 0 <= col < COLS and board[0][col] == 0
@@ -149,15 +149,26 @@ def non_terminal_eval(board):
     
 def evaluate_board(board):
     winner = check_winner(board)
-    if winner == 1: return 10
-    if winner == -1: return -10
-    if winner == 0: return non_terminal_eval(board)
+    # Immediate forced outcomes (BIG weights)
+    if winner == 1:
+        return 1000000    # AI wins immediately
+    elif winner == -1:
+        return -1000000   # human wins immediately
+    elif winner == 0: 
+        return non_terminal_eval(board) + center_score(board)
     return 0
+
+def center_score(board):
+    score = 0
+    center_col = [board[r][COLS//2] for r in range(ROWS)]
+    score += center_col.count(1) * 3    
+    score -= center_col.count(-1) * 3   
+    return score
 
 def minimax(board, depth, is_maximizing, max_depth, alpha, beta):
     score = evaluate_board(board)
-    if score == 10: return score 
-    if score == -10: return score 
+    if score == 1000000 or score == -1000000:
+        return score
     if is_board_full(board) or depth == max_depth: return score
 
     if is_maximizing:
