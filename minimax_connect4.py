@@ -173,7 +173,7 @@ def minimax(board, depth, is_maximizing, max_depth, alpha, beta):
 
     if is_maximizing:
         best = -10**9
-        for col in range(COLS):
+        for col in [3, 2, 4, 1, 5, 0, 6]:
             if is_valid_move(board, col):
                 row = make_move(board, col, 1)
                 val = minimax(board, depth+1, False, max_depth, alpha, beta)
@@ -184,7 +184,7 @@ def minimax(board, depth, is_maximizing, max_depth, alpha, beta):
         return best
     else:
         best = 10**9
-        for col in range(COLS):
+        for col in [3, 2, 4, 1, 5, 0, 6]:
             if is_valid_move(board, col):
                 row = make_move(board, col, -1)
                 val = minimax(board, depth+1, True, max_depth, alpha, beta)
