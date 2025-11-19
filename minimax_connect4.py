@@ -1,3 +1,5 @@
+import time
+
 ROWS = 6
 COLS = 7
 
@@ -241,12 +243,17 @@ def play_cli():
                 continue
             make_move(board, col, -1)
         else:
+
+
             print("AI is thinking...")
+            start_time = time.perf_counter_ns()
             col = find_best_move(board, max_depth=6)
+            end_time = time.perf_counter_ns()
+            elapsed_time = start_time - end_time
             if col is None:
                 print("No moves left.")
                 break
-            print(f"AI chooses column {col}")
+            print(f"AI chooses column {col}. Took {-1*elapsed_time/1000000000} s")
             make_move(board, col, 1)
 
         print_board(board)
