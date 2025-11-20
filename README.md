@@ -48,4 +48,4 @@ The AI plays as **X**, and the human plays as **O**.
 
 Enjoy playing against our AI!
 
-** You can click the COMO560_Final_Project.pdf to view our paper. Make sure to download to view it as preview is not working.
+** You can click the COMP560_Final_Project.pdf to view our paper. Make sure to download to view it as preview is not working.
